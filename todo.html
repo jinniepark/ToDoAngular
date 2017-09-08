@@ -2,95 +2,49 @@
 <html lang="en" ng-app="ToDo">
 <head>
 <meata charset="UTF-8">
-<style>
-.done{text-decoration: line-through; color:#ccc;}
-
-#map-canvas {
-height: 400px;
-width: 100%;
-}
-h1 {
-    color: #4488FF;
-    font-family: 'Raleway', sans-serif;  
-    font-size: 4em;
-    margin-top: auto;
-    margin-bottom:0.5em;
- /*    margin: 0.2em 0pt; */
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
-}
-
-body {
-    text-align: center;
-    background: url("background.jpeg") no-repeat center center fixed;
-    background-size: cover;
-}
-
-
-input[type='text'], textarea {
-    width: 460px;
-    line-height: 1.2;
-    padding: 4px;
-    border: solid 1px #CCC;
-}
-
-label {
-    display: block;
-    font-variant: small-caps;
-}
-
-button, input[type='submit'] {
-    padding: 2px 4px;
-}
-
-.button {
-    padding: 4px 8px;
-    font-family: arial, sans-serif;
-    font-size: 0.75em;
-    font-weight: 700;
-    text-transform:	uppercase;
-    text-shadow: 0 1px rgba(0, 0, 0, 0.1);
-    color: #FFF;
-    background-color: grey;
-    background: linear-gradient(center top, #48F, #46F) repeat-x;
-    border-radius: 2px;
-    border: none;
-    margin-top:2em;
-}
-
-.button:hover {
-    box-shadow: 1px 1px 2px rgba(0,0,0,0.25)
-}
-</style>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 
 <title>todo</title>
 </head>
 <body>
 <h1> TODO </h1>
 <div ng-controller="todoController">
+<div id="forms" style="display:block;">
 <form name="frm" ng-submit="addToDo()">
-<label>What</label><input type="text" name="newTodo" ng-model ="newTodo" required />
-<label>Where</label>
-<!-- </form>
-<form name="where"> -->
-<input type="text" id="lat" ng-model="lat" required />
-<input type="text" id="lng" ng-model="lng" required />
-<!-- <button ng-disabled="frm.$invalid"> Go </button>
- --><input type="button" value="updateCenter" ng-click="getMap()" />
-<button ng-click="clearComplete()">Clear Completed</button>
+<label style="font-size: 2em;">What</label><input style="width: 30%; margin-bottom: 2%;" type="text" name="newTodo" ng-model ="newTodo" required />
 </form>
+<label style="font-size: 2em;">Where</label>
+Latitude <input style="margin-bottom: 1%; width: 10%;" type="text" id="lat" ng-model="lat" required />
+</br>
+Longitude <input style="width: 10%;" type="text" id="lng" ng-model="lng" required />
+</br>
+
+
+<a href="javascript:SwapDivsWithClick('forms', 'lists')" style="margin-top: 1%;" class="btn btn-default">Let's go to the list!</a>
+
+</div>
+
+
+<div id="lists" style="display:none;">
 <ul>
 	<li ng-repeat = "todo in todos">
 	<input type="checkbox" ng-model="todo.done" />
-	<span ng-class="{'done':todo.done}">
+	<span ng-class="{'done':todo.done}" ng-click="getMap(todo.lat, todo.lng)">
 		{{todo.title}}
+        {{todo.lat}}
+        {{todo.lng}}
 		</span>
 	</li>
+    <button  style="margin-top: 1%;" class="btn btn-default" ng-click="clearComplete()">Clear Completed</button>
+    <a href="javascript:SwapDivsWithClick('lists', 'forms')" style="margin-top: 1%;" class="btn btn-default">Add more</a>
 </ul>
 
+<div id="map-canvas"></div>
 </div>
- <div id="map-canvas"></div>
-
-
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
@@ -107,8 +61,8 @@ controller('todoController', ['$scope', function($scope) {
 		$scope.todos.push({'title':$scope.newTodo, 'done':false, 'lat':$scope.lat, 'lng':$scope.lng})
 		$scope.newTodo = ''
 	}
-	$scope.getMap = function() {
-		pan();
+	$scope.getMap = function(a, b) {
+		pan(a, b);
 	}
 	$scope.clearComplete = function() {
 $scope.todos = $scope.todos.filter(function(item){
@@ -120,6 +74,31 @@ $scope.todos = $scope.todos.filter(function(item){
 	}
 	
 }])
+
+
+function SwapDivsWithClick(div1,div2)
+{
+   d1 = document.getElementById(div1);
+   d2 = document.getElementById(div2);
+   if( d2.style.display == "none" )
+   {
+      d1.style.display = "none";
+      d2.style.display = "block";
+   }
+   else
+   {
+      d1.style.display = "block";
+      d2.style.display = "none";
+   }
+}
+
+
+
+
+
+
+
+
 </script>
 <script>
 
@@ -135,8 +114,8 @@ $scope.todos = $scope.todos.filter(function(item){
     }
 
     google.maps.event.addDomListener(window, 'load', initialize);
-    function pan() {
-        var panPoint = new google.maps.LatLng(document.getElementById("lat").value, document.getElementById("lng").value);
+    function pan(a, b) {
+        var panPoint = new google.maps.LatLng(a, b);
         map.panTo(panPoint)
      }
     </script>
